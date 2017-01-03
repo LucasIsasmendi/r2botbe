@@ -29,7 +29,6 @@ db.open(function() {
 if (app.get('env') == 'production') {
   servers.listen(app.get('sslport'));
   console.log("https app is running at host: " + app.get('host') + " - port: " + app.get('sslport') +"- environment: "+ app.get('env'));
-} else {
-  server.listen(app.get('port'));
-  console.log("http app is running at host: " + app.get('host') + " - port: " + app.get('port') +"- environment: "+ app.get('env'));
 }
+server.listen(app.get('port'));
+console.log("http app is running at host: " + app.get('host') + " - port: " + app.get('port') +"- environment: "+ app.get('env'));
