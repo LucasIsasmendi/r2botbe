@@ -1,7 +1,7 @@
 {
-  "name": "Voteck",
-  "short_name": "Voteck",
-  "description": "Voting Check",
+  "name": "VotEx",
+  "short_name": "VotEx",
+  "description": "Vote Explorer",
   "icons": [{
         "src": "images/antena-64.png",
         "sizes": "64x64",
