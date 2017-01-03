@@ -3,7 +3,7 @@ var dataCacheName = 'votexdata-v0.0.1';
 var filesToCache = [
 	'bower_components/angular-material/angular-material.min.css',
 	'style/votex.css',
-	'http://fonts.googleapis.com/icon?family=Material+Icons',
+	'https://fonts.googleapis.com/icon?family=Material+Icons',
 	'bower_components/angular/angular.min.js',
 	'bower_components/angular-animate/angular-animate.min.js',
 	'bower_components/angular-route/angular-route.min.js',
