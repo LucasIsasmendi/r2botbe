@@ -1,0 +1,27 @@
+{
+  "name": "pwa-amd-memu",
+  "authors": [
+    "Lucas Isasmendi <tartalario@yahoo.com.ar>"
+  ],
+  "description": "progressive web app with angular material design for memu",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-material": "^1.0.9",
+    "angular-route": "^1.5.7",
+    "angular-material-icons": "^0.7.1",
+    "async": "^2.1.4",
+    "lodash": "^4.17.3",
+    "angular-chart.js": "^1.1.1",
+    "chart.js": "^2.4.0"
+  }
+}

@@ -1,0 +1,97 @@
+body{margin:0;font-family:'Roboto', 'Noto', sans-serif;line-height:1.5;min-height:100vh;background-color:#eee;}
+
+.bottomSheetdemoBasicUsage .md-inline-list-icon-label {
+  display: inline-block;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: -10px;
+  height: 24px;
+  vertical-align: middle; }
+.bottomSheetdemoBasicUsage .md-grid-item-content {
+  height: 90px;
+  padding-top: 10px; }
+.bottomSheetdemoBasicUsage .md-grid-item-content md-icon {
+  height: 48px;
+  width: 48px; }
+.bottomSheetdemoBasicUsage .md-grid-text {
+  padding-bottom: 5px; }
+.bottomSheetdemoBasicUsage md-list-item, .bottomSheetdemoBasicUsage md-list-item ._md-list-item-inner {
+  min-height: 48px; }
+.bottomSheetdemoBasicUsage h2 {
+  line-height: 36px;
+  padding-top: 10px; }
+.bottomSheetdemoBasicUsage .md-subheader ._md-subheader-inner {
+  padding: 0; }
+.bottomSheetdemoBasicUsage md-toast .md-toast-content {
+  background-color: #B14141; }
+.bottomSheetdemoBasicUsage md-toast > * {
+  font-weight: bolder; }
+.carddemoBasicUsage .card-media {
+  background-color: #999999; }
+
+/*https://jtblin.github.io/angular-chart.js/*/
+.chart-legend {
+  list-style-type: none;
+  margin-top: 5px;
+  text-align: center;
+/* NOTE: Browsers automatically add 40px of padding-left to all lists, so we should offset that, otherwise the legend is off-center */
+  -webkit-padding-start: 0;
+/* Webkit */
+  -moz-padding-start: 0;
+/* Mozilla */
+  padding-left: 0;
+/* IE (handles all cases, really, but we should also include the vendor-specific properties just to be safe) */
+}
+.chart-legend li {
+  display: inline-block;
+  white-space: nowrap;
+  position: relative;
+  margin-bottom: 4px;
+  border-radius: 5px;
+  padding: 2px 8px 2px 28px;
+  font-size: smaller;
+  cursor: default;
+}
+.chart-legend li span {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+}
+/* https://material.angularjs.org/latest/layout/options */
+.md-api-table {
+  margin-bottom: 16px;
+  max-width: 100%;
+  width: 100%;
+  border-spacing: 0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.md-api-table td,
+.md-api-table th {
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.md-api-table td {
+  vertical-align: top;
+}
+.md-api-table td.description *:first-child {
+  margin-top: 0;
+}
+.md-api-table td.description *:last-child {
+  margin-bottom: 0;
+}
+.md-api-table tr:nth-child(odd) td {
+  background-color: #E3ECF5;
+}
+.md-api-table tr:nth-child(even) td {
+  background-color: #D1DEEC;
+}
+.md-api-table th {
+  background-color: #4C9EF0;
+  color: white;
+}
