@@ -18,8 +18,20 @@ const bitcoin = require('bitcoinjs-lib');
 const bitcore = require('bitcore-lib');
 const Message = require('bitcore-message');
 
-let validVotes = [];
-let allVotes = [];
+/*=============================================================================
+* OPTION 1:
+* folder output-op1
+* files:
+  - hackers: attackers, fake voters
+  - voters: valid voters
+  - allVotes: all votes made by hackers + voters (only 1 vote per user)
+  - validVotes: only votes from voters (only 1 vote per user)
+* wallets Content (voter/hacker identity):
+*  - i: next number sequence (counter).
+*  - sk: private Key to sign vote, only know by wallet owner.
+*  - address: address = public key to validate signature
+*
+=============================================================================*/
 
 APIadmin.get('/run-simulation-op1', (req, res) => {
   /***************************************************
@@ -48,6 +60,8 @@ APIadmin.get('/run-simulation-op1', (req, res) => {
 
   // run election
   // loop voters
+  let validVotes = [];
+  let allVotes = [];
   let totalVoters = voters.length;
   for(let i=0; i < totalVoters; i++){
     let voteTo = randomIntInc(0,5);
@@ -95,28 +109,139 @@ APIadmin.get('/generate-totals-op1', (req, res) => {
   res.send("resulst");
 });
 
+
+/*=============================================================================
+* OPTION 2:
+* folder output-op2
+* files:
+*  - hackers: attackers, fake voters
+*  - voters: valid voters
+*  - candidateX_valid: all votes made by voters to candidate X
+*  - candidateX_invalid: all votes made by hackers to candidate X
+*   ** (only 1 vote per user)
+* wallets Content (voter/hacker identity):
+*  - i: next number sequence (counter).
+*  - sk: private Key to sign vote, only know by wallet owner.
+*  - address: address = public key to validate signature
+*
+=============================================================================*/
+// run simulation will generate the files
 APIadmin.get('/run-simulation-op2', (req, res) => {
+  /***************************************************
+  * Seed participants
+  ****************************************************/
+  let votersNumber = req.body.voters || 30;
+  let hackersNumber = req.body.hackers || 40;
+  let foldername = 'output-op2';
+  console.log(`run-simulation-op2 -input totals votersNumber:${votersNumber}, hackersNumber: ${hackersNumber}, foldername:${foldername}`);
+
+  // generate X voters keys
+  const voters = generateWallets(votersNumber);
+  writeFile(foldername, 'voters',voters);
+
+  // generate Y hackers keys
+  const hackers = generateWallets(hackersNumber);
+  writeFile(foldername, 'hackers',hackers);
+
+  // set candidates array
+  const candidates = ["None Of Them", "Steve Jobs", "Bill Gates", "Mark Zuckerberg", "Elon Musk", "Tony Stark", "Bruce Wayne"];
+
+  // set election files
+  const candidatesFiles = [];
+  for(let i=0; i < candidates.length ; i++){
+    let validVotesWSF = fs.createWriteStream('outputs/'+foldername +'/'+i+'_'+ candidates[i]+'_validvotes');
+    let invalidVotesWSF = fs.createWriteStream('outputs/'+foldername +'/'+i+'_'+ candidates[i]+'_invalidvotes');
+    candidatesFiles.push({
+      valids: validVotesWSF,
+      invalids: invalidVotesWSF
+    });
+  }
+  /***************************************************
+  * simulate election
+  ****************************************************/
+  let allVotes = [];
+  // loop voters
+  let totalVoters = voters.length;
+  for(let i=0; i < totalVoters; i++){
+    let voteTo = randomIntInc(0,6);
+    let candidate = candidates[voteTo];
+    let message = new Message(candidate);
+    let signature = message.sign(voters[i].sk);
+    let ballot = {
+      cn: voteTo,
+      sg: signature,
+      ad: voters[i].address
+    };
+    // manual mode will validate signature before inser into valids
+    candidatesFiles[voteTo].valids.write(JSON.stringify(ballot)+'\n');
+    allVotes.push(ballot);
+  }
+  console.log("allVotes length after voters",allVotes.length);
+  // loop hackers
+  let totalHacks = hackers.length;
+  for(let i=0; i < totalHacks; i++){
+    let voteTo = randomIntInc(0,6);
+    let candidate = candidates[voteTo];
+    let message = new Message(candidate);
+    let signature = message.sign(hackers[i].sk);
+    let ballot = {
+      cn: voteTo,
+      sg: signature,
+      ad: hackers[i].address
+    };
+    // manual mode will insert into invalids if signature is not ok
+    candidatesFiles[voteTo].invalids.write( JSON.stringify(ballot)+'\n');
+    allVotes.push(ballot);
+  }
+  console.log("allVotes length after hackers",allVotes.length);
+  writeFile(foldername, 'allVotes',allVotes);
+
+  res.send({status: 'op2-simulation-completed', totals: {candidatesFiles: candidatesFiles, allVotes: allVotes}});
+});
+// valite vote will check if the address is in the valid votes for candidate
+// number, and then check signature
+APIadmin.get('/validate-vote-op2', (req, res) => {
+  let foldername = 'ipfs-btc-a1';
+  // validate votes
+  let totalVotes = allVotes.length;
+  for(let i=0; i < totalVotes; i++){
+    let vote = allVotes[i];
+    let voterisinlist = _.find(voters, function(v){ return v.address === vote.address});
+    if(voterisinlist){
+      // check valid signature
+      let validSignature = new Message(candidates[vote.candidateN]).verify(vote.address, vote.signature);
+      if(validSignature){
+        validVotes.push(vote);
+      }
+    }
+  }
+  res.send("resulst");
+});
+
+
+
+APIadmin.get('/run-simulation-op4', (req, res) => {
   /***************************************************
   * Seed content
   ****************************************************/
   let votersNumber = req.body.voters;
   let hackersNumber = req.body.hackers;
-  let foldername = 'output-op2-red';
-  console.log(`run-simulation-op2 -input totals votersNumber:${votersNumber}, hackersNumber: ${hackersNumber}, foldername:${foldername}`);
+  let foldername = 'output-op4';
+  console.log(`run-simulation-op4 -input totals votersNumber:${votersNumber}, hackersNumber: ${hackersNumber}, foldername:${foldername}`);
   // generate 100 voters keys
-  const voters = generateWallets(100);
+  const voters = generateWallets(20);
   //console.log(`voter 1, PublicKey:${voters[1].pk}, PrivateKey: ${voters[1].sk}, ecKey: ${voters[1].key}`);
   console.log(`voter 1, sk: ${voters[1].sk}, address: ${voters[1].address}`);
   writeFile(foldername,'voters',voters);
 
   // generate 1000 hackers keys
-  const hackers = generateWallets(1000);
+  const hackers = generateWallets(30);
   //console.log(`hacker 1, PublicKey:${hackers[1].pk}, PrivateKey: ${hackers[1].sk}, ecKey: ${hackers[1].key}`);
   console.log(`hacker 1, sk: ${hackers[1].sk}, address: ${hackers[1].address}`);
   writeFile(foldername, 'hackers',hackers);
 
   // set candidates array
-  const candidates = ["Steve Jobs", "Bill Gates", "Mark Zuckerberg", "Elon Musk", "Tony Stark", "Bruce Wayne"];
+  const candidates = ["None of them","Steve Jobs", "Bill Gates", "Mark Zuckerberg", "Elon Musk", "Tony Stark", "Bruce Wayne"];
   const totalByCandidate = [0,0,0,0,0,0];
 
   // run election
@@ -124,7 +249,7 @@ APIadmin.get('/run-simulation-op2', (req, res) => {
   let writefiles = 0;
   let totalVoters = voters.length;
   for(let i=0; i < totalVoters; i++){
-    let voteTo = randomIntInc(0,5);
+    let voteTo = randomIntInc(0,6);
     let candidate = candidates[voteTo];
     let message = new Message(candidate);
     let signature = message.sign(voters[i].sk);
@@ -135,7 +260,7 @@ APIadmin.get('/run-simulation-op2', (req, res) => {
   // loop hackers
   let totalHacks = hackers.length;
   for(let i=0; i < totalHacks; i++){
-    let voteTo = randomIntInc(0,5);
+    let voteTo = randomIntInc(0,6);
     let candidate = candidates[voteTo];
     let message = new Message(candidate);
     let signature = message.sign(hackers[i].sk);
