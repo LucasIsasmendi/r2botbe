@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
+    "start": "node -v; node --harmony-async-await server.js",
     "dev": "nodemon server.js"
   },
   "engines": {
@@ -15,6 +15,8 @@
   "author": "Lucas Isasmendi",
   "license": "MIT",
   "dependencies": {
+    "async": "^2.1.4",
+    "asyncawait": "^1.0.6",
     "bitcoinjs-lib": "^2.3.0",
     "bitcore-lib": "^0.13.19",
     "bitcore-message": "^1.0.2",
@@ -26,9 +28,12 @@
     "express": "^4.13.3",
     "http": "0.0.0",
     "https": "^1.0.0",
+    "ipfs": "^0.21.8",
     "lodash": "^4.17.3",
     "mongodb": "^2.2.16",
+    "os": "^0.1.1",
     "path": "^0.12.7",
+    "promise": "^7.1.1",
     "randomstring": "^1.1.5",
     "socket.io": "^1.6.0"
   },

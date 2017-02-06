@@ -1,22 +1,26 @@
+'use strict'
+
 const APIadmin = require('express').Router();
 const db = require('../lib/mongodb-functions');
 
-const CryptoJS = require("crypto-js");
-const AES = require("crypto-js/aes");
-const SHA256 = require("crypto-js/sha256");
+//const CryptoJS = require("crypto-js");
+//const AES = require("crypto-js/aes");
+//const SHA256 = require("crypto-js/sha256");
 const randomstring = require("randomstring");
 
 const crypto = require('crypto');
 const fs = require('fs');
 
-const EC = require('elliptic').ec;
-const ec = new EC('secp256k1');
+//const EC = require('elliptic').ec;
+//const ec = new EC('secp256k1');
 const _ = require('lodash');
 
 const bitcoin = require('bitcoinjs-lib');
 
 const bitcore = require('bitcore-lib');
 const Message = require('bitcore-message');
+
+const ipfs = require('../lib/ipfs-functions');
 
 /*=============================================================================
 * OPTION 1:
@@ -126,6 +130,7 @@ APIadmin.get('/generate-totals-op1', (req, res) => {
 *
 =============================================================================*/
 // run simulation will generate the files
+const ipfsFilesToAdd = [];
 APIadmin.get('/run-simulation-op2', (req, res) => {
   /***************************************************
   * Seed participants
@@ -133,19 +138,34 @@ APIadmin.get('/run-simulation-op2', (req, res) => {
   let votersNumber = req.body.voters || 30;
   let hackersNumber = req.body.hackers || 40;
   let foldername = 'output-op2';
+
   console.log(`run-simulation-op2 -input totals votersNumber:${votersNumber}, hackersNumber: ${hackersNumber}, foldername:${foldername}`);
 
   // generate X voters keys
   const voters = generateWallets(votersNumber);
   writeFile(foldername, 'voters',voters);
-
+  ipfsFilesToAdd.push({
+    path: 'outputs/'+foldername +'/voters',
+    content: fs.createReadStream('outputs/'+foldername +'/voters')
+  })
   // generate Y hackers keys
   const hackers = generateWallets(hackersNumber);
   writeFile(foldername, 'hackers',hackers);
-
+  ipfsFilesToAdd.push({
+    path: 'outputs/'+foldername +'/hackers',
+    content: fs.createReadStream('outputs/'+foldername +'/hackers')
+  })
   // set candidates array
   const candidates = ["None Of Them", "Steve Jobs", "Bill Gates", "Mark Zuckerberg", "Elon Musk", "Tony Stark", "Bruce Wayne"];
-
+  const candidatesToFile = []
+  for (let i = 0; i < candidates.length; i++){
+    candidatesToFile.push({cn: i, c: candidates[i]})
+  }
+  writeFile(foldername, 'candidates',candidatesToFile);
+  ipfsFilesToAdd.push({
+    path: 'outputs/'+foldername +'/candidates',
+    content: fs.createReadStream('outputs/'+foldername +'/candidates')
+  })
   // set election files
   const candidatesFiles = [];
   for(let i=0; i < candidates.length ; i++){
@@ -155,6 +175,14 @@ APIadmin.get('/run-simulation-op2', (req, res) => {
       valids: validVotesWSF,
       invalids: invalidVotesWSF
     });
+    ipfsFilesToAdd.push({
+      path: 'outputs/'+foldername +'/'+i+'_'+ candidates[i]+'_validvotes',
+      content: fs.createReadStream('outputs/'+foldername +'/'+i+'_'+ candidates[i]+'_validvotes')
+    })
+    ipfsFilesToAdd.push({
+      path: 'outputs/'+foldername +'/'+i+'_'+ candidates[i]+'_invalidvotes',
+      content: fs.createReadStream('outputs/'+foldername +'/'+i+'_'+ candidates[i]+'_invalidvotes')
+    })
   }
   /***************************************************
   * simulate election
@@ -195,11 +223,111 @@ APIadmin.get('/run-simulation-op2', (req, res) => {
   }
   console.log("allVotes length after hackers",allVotes.length);
   writeFile(foldername, 'allVotes',allVotes);
-
+  ipfsFilesToAdd.push({
+    path: 'outputs/'+foldername +'/allVotes',
+    content: fs.createReadStream('outputs/'+foldername +'/allVotes')
+  })
   res.send({status: 'op2-simulation-completed', totals: {candidatesFiles: candidatesFiles, allVotes: allVotes}});
 });
+
+// close election will send the files to IPFS and store hashes into MongoDB
+APIadmin.get('/close-election-op2', (req, res) => {
+  let foldername = 'output-op2';
+  if(ipfsFilesToAdd === null || ipfsFilesToAdd === undefined || ipfsFilesToAdd.length === 0){
+    console.log("cargar archivos de folder", ipfsFilesToAdd);
+    fs.readdir('outputs/'+foldername, function(err, items) {
+      if (err) return console.log(err);
+      console.log(" function readdir items: ", items)
+      for (let i = 0; i < items.length; i++){
+        ipfsFilesToAdd.push({
+          path: 'outputs/'+foldername +'/'+ items[i],
+          content: fs.createReadStream('outputs/'+foldername +'/'+ items[i])
+        })
+      }
+      console.log("ipfsFilesToAdd from directory", ipfsFilesToAdd);
+      ipfs.saveFiles(ipfsFilesToAdd, function(err, cbipfshash){
+        console.log("ipfs.saveFiles",cbipfshash)
+        res.send({ipfsFiles: cbipfshash});
+      })
+    });
+  } else {
+    console.log("ipfsFilesToAdd running instance", ipfsFilesToAdd);
+    ipfs.saveFiles(ipfsFilesToAdd, function(err, cbipfshash){
+      console.log("ipfs.saveFiles",cbipfshash)
+      res.send({ipfsFiles: cbipfshash});
+    })
+
+  }
+})
+
+// close election will send the files to IPFS and store hashes into MongoDB
+APIadmin.get('/close-election-op2-v2', (req, res) => {
+  let foldername = 'output-op2';
+  const ipfsFilesToAddv2 = [];
+  fs.readdir('outputs/'+foldername, function(err, items) {
+    if (err) return console.log(err);
+    console.log(" function readdir items: ", items)
+    for (let i = 0; i < items.length; i++){
+      ipfsFilesToAddv2.push({
+        path: 'outputs/'+foldername +'/'+ items[i],
+        content: fs.createReadStream('outputs/'+foldername +'/'+ items[i])
+      })
+    }
+    console.log("ipfsFilesToAdd from directory", ipfsFilesToAdd);
+    ipfs.saveFilesV2(ipfsFilesToAddv2, function(err, cbipfshash){
+      if (err) {
+        res.send({err: err});
+        console.log(err);
+      }
+      console.log("ipfs.saveFiles",cbipfshash)
+      res.send({ipfssaveFilesV2: cbipfshash});
+    })
+  });
+  if(ipfsFilesToAdd === null || ipfsFilesToAdd === undefined || ipfsFilesToAdd.length === 0){
+    console.log("cargar archivos de folder", ipfsFilesToAdd);
+    fs.readdir('outputs/'+foldername, function(err, items) {
+      if (err) return console.log(err);
+      console.log(" function readdir items: ", items)
+      for (let i = 0; i < items.length; i++){
+        ipfsFilesToAdd.push({
+          path: 'outputs/'+foldername +'/'+ items[i],
+          content: ReadStream
+        })
+      }
+      console.log("ipfsFilesToAdd from directory", ipfsFilesToAdd);
+      ipfs.saveFiles(ipfsFilesToAdd, function(err, cbipfshash){
+        console.log("ipfs.saveFiles",cbipfshash)
+        res.send({ipfsFiles: cbipfshash});
+      })
+    });
+  } else {
+    console.log("ipfsFilesToAdd running instance", ipfsFilesToAdd);
+    ipfs.saveFiles(ipfsFilesToAdd, function(err, cbipfshash){
+      console.log("ipfs.saveFiles",cbipfshash)
+      res.send({ipfsFiles: cbipfshash});
+    })
+
+  }
+})
+
 // valite vote will check if the address is in the valid votes for candidate
 // number, and then check signature
+
+APIadmin.get('/get-ipfs-file-op2', (req, res) => {
+  const hash = req.query.hash
+  const repopath = req.query.repopath
+  console.log("req",req.query)
+  console.log(`/get-ipfs-file-op2 hash: ${hash} - repopath ${repopath}`)
+  ipfs.getFile(repopath, hash, function(err, cbfile){
+    if (err) {
+      console.log("error ipfs.getFile", err);
+      res.send({err: err});
+    } else {
+      res.send({file: cbfile});
+    }
+  })
+
+});
 APIadmin.get('/validate-vote-op2', (req, res) => {
   let foldername = 'ipfs-btc-a1';
   // validate votes
@@ -280,8 +408,7 @@ module.exports = APIadmin;
 /**********************************************************************
 *   Local Functions
 **********************************************************************/
-function rng () { return new Buffer(randomstring.generate()) }
-generateWallets = function(total){
+function generateWallets(total){
   let wallets = [];
   for(let i = 0; i < total; i++){
     //let newUser = crypto.createECDH('secp256k1');
@@ -306,12 +433,20 @@ generateWallets = function(total){
   return wallets;
 };
 
-writeFile = function(foldername, filename, filedata){
+function writeFile(foldername, filename, filedata){
   fs.writeFile('outputs/'+foldername +'/'+filename, JSON.stringify(filedata), function (err) {
     if (err) return console.log(err);
     console.log('Wrote!');
   });
 }
+function readDirectory(path){
+  fs.readdir(path, function(err, items) {
+    if (err) return console.log(err);
+    console.log(" function readDirectory items: ", items)
+    return items;
+  });
+}
 function randomIntInc (low, high) {
     return Math.floor(Math.random() * (high - low + 1) + low);
 }
+function rng () { return new Buffer(randomstring.generate()) }

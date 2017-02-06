@@ -59,8 +59,8 @@ self.addEventListener('activate', function(e) {
 });
 self.addEventListener('fetch', function(e) {
   console.log('[ServiceWorker] Fetch', e.request.url);
-  var dataUrl = 'https://votexhk.herokuapp.com/';
-  //var dataUrl = 'http://localhost:8080/';
+  //var dataUrl = 'https://votexhk.herokuapp.com/';
+  var dataUrl = 'http://localhost:8080/';
   if (e.request.url.indexOf(dataUrl) === 0) {
 	e.respondWith(
 	  fetch(e.request)
