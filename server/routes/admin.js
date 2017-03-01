@@ -8,6 +8,8 @@ const files = require('../lib/files')
 
 const ipfs = require('../lib/ipfs')
 
+const foldername = process.env.FOLDER_NAME || 'output-r2'
+
 /*=============================================================================
 * folder: output-op2
 * files:
@@ -25,7 +27,6 @@ const ipfs = require('../lib/ipfs')
 
 // close election will send the files to IPFS and store hashes into MongoDB
 APIadmin.get('/close-election', (req, res) => {
-  let foldername = 'output-op2'
   const ipfsFilesToAddv2 = []
   files.readDirectory('outputs/' + foldername, function (err, items) {
     if (err) return console.log(err)
