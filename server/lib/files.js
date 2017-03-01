@@ -2,8 +2,9 @@
 
 const fs = require('fs')
 
-function appendFile (foldername, filename, filedata) {
-  fs.appendFile(foldername + '/' + filename, JSON.stringify(filedata), (err) => {
+function appendFile (foldername, filename, filedata, delimiter) {
+  const data = JSON.stringify(filedata) + delimiter
+  fs.appendFile(foldername + '/' + filename, data, (err) => {
     if (err) throw err
     console.log('Added!', filename)
   })

@@ -14,6 +14,8 @@ const filenameValidVotes = 'valid_votes'
 const filenameInvalidVotes = 'invalid_votes'
 const filenameVoters = 'voters'
 
+const delimiterNewLine = '\r\n'
+
 APIvote.get('/test', (req, res) => {
   res.send('response from API vote')
 })
@@ -24,7 +26,7 @@ APIvote.get('/getnewkey', function (req, res) {
       res.send({err: 'error adding voters'})
       console.log('error insert new voter address - getnewkey', err)
     } else {
-      files.appendFile(folderOutput, filenameVoters, newkey.address)
+      files.appendFile(folderOutput, filenameVoters, newkey.address, delimiterNewLine)
       res.send(newkey)
     }
   })
@@ -84,13 +86,13 @@ APIvote.post('/castvote', function (req, res) {
           if (err) {
             res.send({err: 'error updating vote'})
           } else {
-            files.appendFile(folderOutput, filenameValidVotes, ballot)
+            files.appendFile(folderOutput, filenameValidVotes, ballot, delimiterNewLine)
             res.send('vote processed successfully!')
           }
         })
       } else {
         // invalid signature
-        files.appendFile(folderOutput, filenameInvalidVotes, ballot)
+        files.appendFile(folderOutput, filenameInvalidVotes, ballot, delimiterNewLine)
         res.send({err: 'invalid signature'})
       }
     }
