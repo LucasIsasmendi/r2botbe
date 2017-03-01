@@ -1,7 +1,7 @@
 var config = require('../config/config')
 console.log('config values', config)
 var environment
-if (process.env.NODE_ENV === undefined) {
+if (process.env.NODE_ENV === undefined || process.env.NODE_ENV === 'test') {
   environment = 'development'
   var Db = require('mongodb').Db,
     Connection = require('mongodb').Connection,

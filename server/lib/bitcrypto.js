@@ -5,10 +5,11 @@ const Message = require('bitcore-message')
 
 function generateKey () {
   let privateKey = new bitcore.PrivateKey()
-  let publicKey = privateKey.toPublicKey()
-  let address = privateKey.toAddress()
+  let secretKeyWIF = privateKey.toWIF()
+  let publicKey = privateKey.toPublicKey().toString()
+  let address = privateKey.toAddress().toString()
   return {
-    sk: privateKey,
+    sk: secretKeyWIF,
     pubk: publicKey,
     address: address
   }

@@ -10,7 +10,8 @@ const ipfs = require('../lib/ipfs')
 
 const foldername = process.env.FOLDER_NAME || 'output-r2'
 
-/*=============================================================================
+/*
+* =============================================================================
 * folder: output-op2
 * files:
 *  - election: description of the process, extra information
@@ -23,7 +24,12 @@ const foldername = process.env.FOLDER_NAME || 'output-r2'
 * tables:
 *  - voters: btc address, does_it_vote (true, false)
 *
-=============================================================================*/
+* =============================================================================
+*/
+
+APIadmin.get('/data-integrity-process', (req, res) => {
+  console.log('data integrity process: database & flat files show we equal')
+})
 
 // close election will send the files to IPFS and store hashes into MongoDB
 APIadmin.get('/close-election', (req, res) => {

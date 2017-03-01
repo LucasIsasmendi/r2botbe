@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'staging') {
   }
 } else {
   module.exports = {
-    TOKEN_SECRET: process.env.TOKEN_SECRET || ']<t2fNK!J==DYM~F7418[D2eaz=;$:SqX~d',
+    TOKEN_SECRET: process.env.TOKEN_SECRET || 'test',
     MONGO_URI: process.env.MONGO_URI || 'localhost'
   }
 }

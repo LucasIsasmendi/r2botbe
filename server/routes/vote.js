@@ -5,6 +5,7 @@ const db = require('../lib/mongodb-functions')
 
 const bcl = require('../lib/bitcrypto')
 const files = require('../lib/files')
+const ObjectID = require('mongodb').ObjectID
 
 const foldername = process.env.FOLDER_NAME || 'output-r2'
 
