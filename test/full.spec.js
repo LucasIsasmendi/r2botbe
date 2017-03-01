@@ -1,5 +1,5 @@
 process.env.NODE_ENV = 'test'
-
+// process.env.FOLDER_OUTPUT = './output-r2/'
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const server = require('../server/index')

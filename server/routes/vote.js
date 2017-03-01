@@ -7,7 +7,12 @@ const bcl = require('../lib/bitcrypto')
 const files = require('../lib/files')
 const ObjectID = require('mongodb').ObjectID
 
-const foldername = process.env.FOLDER_NAME || 'outputs/output-r2'
+const config = require('../config/config')
+const folderOutput = config.FOLDER_OUTPUT
+
+const filenameValidVotes = 'valid_votes'
+const filenameInvalidVotes = 'invalid_votes'
+const filenameVoters = 'voters'
 
 APIvote.get('/test', (req, res) => {
   res.send('response from API vote')
@@ -19,7 +24,7 @@ APIvote.get('/getnewkey', function (req, res) {
       res.send({err: 'error adding voters'})
       console.log('error insert new voter address - getnewkey', err)
     } else {
-      files.appendFile(foldername, 'voters', newkey.address)
+      files.appendFile(folderOutput, filenameVoters, newkey.address)
       res.send(newkey)
     }
   })
@@ -79,13 +84,13 @@ APIvote.post('/castvote', function (req, res) {
           if (err) {
             res.send({err: 'error updating vote'})
           } else {
-            files.appendFile(foldername, 'votes_valids', ballot)
+            files.appendFile(folderOutput, filenameValidVotes, ballot)
             res.send('vote processed successfully!')
           }
         })
       } else {
         // invalid signature
-        files.appendFile(foldername, 'votes_invalids', ballot)
+        files.appendFile(folderOutput, filenameInvalidVotes, ballot)
         res.send({err: 'invalid signature'})
       }
     }
