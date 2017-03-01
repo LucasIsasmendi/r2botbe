@@ -7,7 +7,7 @@ const bcl = require('../lib/bitcrypto')
 const files = require('../lib/files')
 const ObjectID = require('mongodb').ObjectID
 
-const foldername = process.env.FOLDER_NAME || 'output-r2'
+const foldername = process.env.FOLDER_NAME || 'outputs/output-r2'
 
 APIvote.get('/test', (req, res) => {
   res.send('response from API vote')
@@ -25,28 +25,36 @@ APIvote.get('/getnewkey', function (req, res) {
   })
 })
 APIvote.get('/doesitvote', function (req, res) {
-  const address = req.query.address
+  const address = req.body.address
   db.findOne('voters', { _id: address }, function (err, record) {
     if (err) {
       res.send({err: 'error searching vote'})
       console.log('error searching vote - doesitvote', err)
-    } else if (record === undefined || record.voted === false) {
+    } else if (record === undefined || record === null) {
+      res.send('invalid address')
+    } else if (record.voted === false) {
       res.send('address without vote')
     } else {
       res.send('address voted')
     }
   })
 })
-APIvote.get('/checksignature', function (req, res) {
-  let verified = bcl.checkSignature(req.query.address, req.query.plainvote, req.query.signedvote)
-  if (verified === true) {
-    res.send(true)
-  }
-  res.send(false)
+
+APIvote.get('/signballot', function (req, res) {
+  let signedvote = bcl.signMessage(req.body.ballot, req.body.secretkey)
+  res.send({signedvote: signedvote})
 })
 
-APIvote.get('/castvote', function (req, res) {
-  const address = req.query.address
+APIvote.get('/checksignature', function (req, res) {
+  let verified = bcl.checkSignature(req.body.address, req.body.plainvote, req.body.signedvote)
+  if (verified === true) {
+    res.send('valid signature')
+  }
+  res.send('invalid signature')
+})
+
+APIvote.post('/castvote', function (req, res) {
+  const address = req.body.address
   db.findOne('voters', { _id: address }, function (err, record) {
     if (err) {
       res.send({err: 'error searching address'})
@@ -59,12 +67,12 @@ APIvote.get('/castvote', function (req, res) {
       res.send({err: 'address already vote'})
     } else {
       const ballot = {
-        vote: req.query.plainvote,
-        sign: req.query.signedvote,
-        ad: address
+        ad: address,
+        vote: req.body.plainvote,
+        sign: req.body.signedvote
       }
       // verified user signature
-      let verified = bcl.checkSignature(address, req.query.plainvote, req.query.signedvote)
+      let verified = bcl.checkSignature(ballot.ad, ballot.vote, ballot.sign)
       if (verified === true) {
         // valid signature
         db.update('voters', {_id: address}, {voted: true, vote: ballot.vote, sign: ballot.sign}, function (err, record) {
@@ -72,7 +80,7 @@ APIvote.get('/castvote', function (req, res) {
             res.send({err: 'error updating vote'})
           } else {
             files.appendFile(foldername, 'votes_valids', ballot)
-            res.send({ok: 'vote processed successfully!'})
+            res.send('vote processed successfully!')
           }
         })
       } else {

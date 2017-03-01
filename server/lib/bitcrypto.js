@@ -22,7 +22,13 @@ function checkSignature (address, message, signedmsg) {
   }
   return false
 }
+function signMessage (message, secretKeyStr) {
+  let secretKey = bitcore.PrivateKey.fromWIF(secretKeyStr)
+  let signature = Message(message).sign(secretKey)
+  return signature
+}
 module.exports = {
-  generateKey: generateKey,
-  checkSignature: checkSignature
+  generateKey,
+  checkSignature,
+  signMessage
 }
