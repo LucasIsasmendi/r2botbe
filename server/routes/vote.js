@@ -101,4 +101,23 @@ APIvote.post('/castvote', function (req, res) {
   })
 })
 
+APIvote.post('/castvotefull', function (req, res) {
+  const newkey = bcl.generateKey()
+  const signedvote = bcl.signMessage(req.body.plainvote, newkey.sk)
+  const ballot = {
+    address: newkey.address,
+    vote: req.body.plainvote,
+    sign: signedvote
+  }
+  db.insert('voters', {_id: ballot.address, voted: true, vote: ballot.vote, sign: ballot.sign}, function (err, record) {
+    if (err) {
+      res.send({err: 'error updating vote'})
+    } else {
+      files.appendFile(folderOutput, filenameValidVotes, ballot, delimiterNewLine)
+      files.appendFile(folderOutput, filenameVoters, newkey.address, delimiterNewLine)
+      res.send({status: 'vote processed successfully!', ballot: ballot, key: newkey})
+    }
+  })
+})
+
 module.exports = APIvote

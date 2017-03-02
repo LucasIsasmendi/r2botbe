@@ -6,14 +6,12 @@ function appendFile (foldername, filename, filedata, delimiter) {
   const data = JSON.stringify(filedata) + delimiter
   fs.appendFile(foldername + '/' + filename, data, (err) => {
     if (err) throw err
-    console.log('Added!', filename)
   })
 }
 
 function writeFile (foldername, filename, filedata) {
   fs.writeFile(foldername + '/' + filename, JSON.stringify(filedata), function (err) {
     if (err) throw err
-    console.log('Wrote!', filename)
   })
 }
 
