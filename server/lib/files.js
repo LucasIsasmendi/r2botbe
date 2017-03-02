@@ -20,6 +20,9 @@ function writeFile (foldername, filename, filedata) {
 function checkDirectory (dir) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir)
+    console.log('Directory to write files created: ', dir)
+  } else {
+    console.log('Directory to write files exists: ', dir)
   }
 }
 
