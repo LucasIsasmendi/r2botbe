@@ -16,6 +16,8 @@ const filenameVoters = 'voters'
 
 const delimiterNewLine = '\r\n'
 
+files.checkDirectory(folderOutput)
+
 APIvote.get('/test', (req, res) => {
   res.send('response from API vote')
 })

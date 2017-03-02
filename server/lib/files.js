@@ -17,6 +17,12 @@ function writeFile (foldername, filename, filedata) {
   })
 }
 
+function checkDirectory (dir) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir)
+  }
+}
+
 function readDirectory (path) {
   fs.readdir(path, function (err, items) {
     if (err) throw err
@@ -28,5 +34,6 @@ function readDirectory (path) {
 module.exports = {
   appendFile: appendFile,
   writeFile: writeFile,
+  checkDirectory: checkDirectory,
   readDirectory: readDirectory
 }
