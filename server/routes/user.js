@@ -9,7 +9,7 @@ APIuser.get('/test', (req, res) => {
 APIuser.post('/votedone', function (req, res) {
   const phone = req.body.phone
   const hkid = req.body.hkid
-  db.insert('users', { phone: phone, hkid: hkid, voted: true }, function (err, cb) {
+  db.insert('users', { _id: phone, hkid: hkid, voted: true }, function (err, cb) {
     if (err) {
       res.send({err: 'error adding voters'})
       console.log('error upsert user', err)
