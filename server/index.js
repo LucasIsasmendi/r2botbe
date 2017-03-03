@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 
 const APIvote = require('./routes/vote')
 const APIadmin = require('./routes/admin')
+const APIuser = require('./routes/user')
 const db = require('./lib/mongodb-functions')
 
 const server = require('http').createServer(app)
@@ -18,6 +19,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json())
 
 app.use('/', APIvote)
+app.use('/user', APIuser)
 app.use('/admin', APIadmin)
 
 db.open(function () {

@@ -2,26 +2,26 @@ process.env.NODE_ENV = 'test'
 // process.env.FOLDER_OUTPUT = './output-r2/'
 const chai = require('chai')
 const chaiHttp = require('chai-http')
-const server = require('../server/index')
+const server = require('../../server/index')
 const should = chai.should()
 
 chai.use(chaiHttp)
 
-describe('Test response', () => {
-  describe('/GET test', () => {
-    it('it should GET "response from API vote"', (done) => {
-      chai.request(server)
-        .get('/test')
-        .end((err, res) => {
-          if (err) throw err
-          res.should.have.status(200)
-          res.text.should.be.eql('response from API vote')
-          done()
-        })
+describe('Full test API VOTE', () => {
+  describe('Test response', () => {
+    describe('/GET test', () => {
+      it('it should GET "response from API vote"', (done) => {
+        chai.request(server)
+          .get('/test')
+          .end((err, res) => {
+            if (err) throw err
+            res.should.have.status(200)
+            res.text.should.be.eql('response from API vote')
+            done()
+          })
+      })
     })
   })
-})
-describe('Full test API VOTE', () => {
   let voter
   const ballot = 'soaasso'
   let signedvote

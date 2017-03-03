@@ -41,6 +41,9 @@ module.exports = {
   update: function(name, query, updateQuery, callback) {
     db.collection(name).update(query, updateQuery, callback)
   },
+  upsert: function(name, query, updateQuery, callback) {
+    db.collection(name).update(query, updateQuery, {upsert:true}, callback);
+  },
   open: function(callback) {
     // 19/06/2014: OJO con esto, posible agujero de seguridad
     if(environment === "development"){

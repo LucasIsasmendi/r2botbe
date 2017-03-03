@@ -4,24 +4,48 @@ This release is part of the **R2BOT FAMILY**:
 * **r2botfe** (election bot): interface wit the user
 
 ## API
-### Election
+### Main (API)
+#### Full
 `/castvotefull`
+
+#### step by step
+`/getnewkey`
+
+`/doesitvote`
+
+`/signballot`
+
+`/checksignature`
+
+`/castvote`
+
+### User (User)
+`/user/votedone`
+* receive phone number
+* vote status set true mongodb collection **users**
+
+`/user/doesitvote`
+* receive phone number
+* return if user allready voted, check vote status into mongodb collection **users**
+
+### Election (Admin)
+`/admin/castvotefull`
 * receive ballot string options "soa",
 * generates wallet, sign ballot,
-* insert address, ballot and signed ballot into mongodb
+* insert address, ballot and signed ballot into mongodb collection **voters**
 * insert address, ballot and signed ballot into valid votes file
 * return wallet + signed ballot
 
-`/data-integrity-process` **Pending Dev**
+`/admin/data-integrity-process` **Pending Dev**
 * validate information integrity with database. flat files and external source
 * returns valid or invalid
 
-`/closeelection` **Pending Dev**
+`/admin/closeelection` **Pending Dev**
 * send files to IPFS
 * send ipfs main folder hash to bitcoin
 * returns ipfs main hash, bitcoin transaction hash
 
-### Files
+#### Files
 `/admin/downloadfile/valid_votes`
 * get all valid votes
 

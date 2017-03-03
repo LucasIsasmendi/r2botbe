@@ -7,21 +7,21 @@ const should = chai.should()
 
 chai.use(chaiHttp)
 
-describe('Test response', () => {
-  describe('/GET test', () => {
-    it('it should GET "response from API vote"', (done) => {
-      chai.request(server)
-        .get('/test')
-        .end((err, res) => {
-          if (err) throw err
-          res.should.have.status(200)
-          res.text.should.be.eql('response from API vote')
-          done()
-        })
+describe('One Step test API VOTE', () => {
+  describe('Test response', () => {
+    describe('/GET test', () => {
+      it('it should GET "response from API vote"', (done) => {
+        chai.request(server)
+          .get('/test')
+          .end((err, res) => {
+            if (err) throw err
+            res.should.have.status(200)
+            res.text.should.be.eql('response from API vote')
+            done()
+          })
+      })
     })
   })
-})
-describe('One Step test API VOTE', () => {
   const ballot = 'osassao'
   describe('/castvotefull', () => {
     it(`it should vote ${ballot}`, (done) => {
@@ -42,17 +42,17 @@ describe('One Step test API VOTE', () => {
         })
     })
   })
-})
-describe('/GET file', () => {
-  it('it should GET voters file', (done) => {
-    chai.request(server)
-      .get('/downloadfile/voters')
-      .end((err, res) => {
-        if (err) throw err
-        console.log('voters', res)
-        res.should.have.status(200)
-        res.text.should.be.eql('response from API vote')
-        done()
-      })
+  describe('/GET file', () => {
+    it('it should GET voters file', (done) => {
+      chai.request(server)
+        .get('/downloadfile/voters')
+        .end((err, res) => {
+          if (err) throw err
+          console.log('voters', res)
+          res.should.have.status(200)
+          res.text.should.be.eql('response from API vote')
+          done()
+        })
+    })
   })
 })

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node -v; node server/index.js",
     "dev": "standard && nodemon server/index.js",
-    "test": "mocha --timeout 10000 "
+    "test": "mocha --timeout 10000",
+    "test-recursive": "mocha --recursive"
   },
   "engines": {
     "node": "6.9.2",
