@@ -1,6 +1,6 @@
 # Vote App r2botbe
 This release is part of the **R2BOT FAMILY**:
-* **r2botsdk** (popvote-sdk): validates hkid, phone#, avoid cast more than once, call r2botbe
+* **r2botsdk** (popvote-sdk): validates hkid, phone#, avoid cast more than once, call **r2botbe** (this release)
 * **r2botfe** (election bot): interface wit the user
 
 ## API
