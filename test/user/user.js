@@ -22,7 +22,7 @@ describe('-> Vote and check vote', () => {
       })
     })
   })
-  const phone = '123456789'
+  const phone = '113456789'
   const hkid = '11111'
   describe('vote', () => {
     it(`it should vote from ${phone}`, (done) => {
@@ -46,6 +46,19 @@ describe('-> Vote and check vote', () => {
           if (err) throw err
           res.should.have.status(200)
           res.text.should.be.eql('user vote')
+          done()
+        })
+    })
+  })
+  describe('duplicate', () => {
+    it(`it should show ${phone} already vote`, (done) => {
+      chai.request(server)
+        .post('/user/votedone')
+        .send({phone: phone, hkid: hkid})
+        .end((err, res) => {
+          if (err) throw err
+          res.should.have.status(200)
+          res.text.should.be.eql('phone already vote')
           done()
         })
     })

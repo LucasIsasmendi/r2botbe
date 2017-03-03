@@ -48,9 +48,8 @@ describe('One Step test API VOTE', () => {
         .get('/admin/downloadfile/voters')
         .end((err, res) => {
           if (err) throw err
-          console.log('voters', res)
           res.should.have.status(200)
-          res.text.should.be.eql('response from API vote')
+          res.text.should.have.length.above(1)
           done()
         })
     })
