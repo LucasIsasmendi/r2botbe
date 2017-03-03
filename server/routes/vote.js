@@ -10,9 +10,9 @@ const ObjectID = require('mongodb').ObjectID
 const config = require('../config/config')
 const folderOutput = config.FOLDER_OUTPUT
 
-const filenameValidVotes = 'valid_votes'
-const filenameInvalidVotes = 'invalid_votes'
-const filenameVoters = 'voters'
+const filenameValidVotes = config.FLN_VALID_VOTES
+const filenameInvalidVotes = config.FLN_INVALID_VOTES
+const filenameVoters = config.FLN_VOTERS
 
 const delimiterNewLine = '\r\n'
 

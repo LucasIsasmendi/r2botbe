@@ -8,7 +8,12 @@ const files = require('../lib/files')
 
 const ipfs = require('../lib/ipfs')
 
-const foldername = process.env.FOLDER_NAME || 'output-r2'
+const config = require('../config/config')
+const folderOutput = config.FOLDER_OUTPUT
+
+const filenameValidVotes = config.FLN_VALID_VOTES
+const filenameInvalidVotes = config.FLN_INVALID_VOTES
+const filenameVoters = config.FLN_VOTERS
 
 /*
 * =============================================================================
@@ -26,6 +31,19 @@ const foldername = process.env.FOLDER_NAME || 'output-r2'
 *
 * =============================================================================
 */
+function getFileName (filetype) {
+  const filenameDownload = {
+    'valid_votes': filenameValidVotes,
+    'invalid_votes': filenameInvalidVotes,
+    'voters': filenameVoters
+  }
+  return filenameDownload[filetype] || 'fnf'
+}
+
+APIadmin.get('/downloadfile/:filename', (req, res) => {
+  let fileName = getFileName(req.params.filename)
+  res.download(folderOutput, fileName)
+})
 
 APIadmin.get('/data-integrity-process', (req, res) => {
   console.log('data integrity process: database & flat files show we equal')
@@ -34,13 +52,13 @@ APIadmin.get('/data-integrity-process', (req, res) => {
 // close election will send the files to IPFS and store hashes into MongoDB
 APIadmin.get('/close-election', (req, res) => {
   const ipfsFilesToAddv2 = []
-  files.readDirectory('outputs/' + foldername, function (err, items) {
+  files.readDirectory('outputs/' + folderOutput, function (err, items) {
     if (err) return console.log(err)
     console.log('function readdir items: ', items)
     for (let i = 0; i < items.length; i++) {
       ipfsFilesToAddv2.push({
-        path: 'outputs/' + foldername + '/' + items[i],
-        content: fs.createReadStream('outputs/' + foldername + '/' + items[i])
+        path: 'outputs/' + folderOutput + '/' + items[i],
+        content: fs.createReadStream('outputs/' + folderOutput + '/' + items[i])
       })
     }
     console.log('ipfsFilesToAdd from directory', ipfsFilesToAddv2)
