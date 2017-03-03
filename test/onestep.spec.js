@@ -43,3 +43,16 @@ describe('One Step test API VOTE', () => {
     })
   })
 })
+describe('/GET file', () => {
+  it('it should GET voters file', (done) => {
+    chai.request(server)
+      .get('/downloadfile/voters')
+      .end((err, res) => {
+        if (err) throw err
+        console.log('voters', res)
+        res.should.have.status(200)
+        res.text.should.be.eql('response from API vote')
+        done()
+      })
+  })
+})

@@ -42,7 +42,16 @@ function getFileName (filetype) {
 
 APIadmin.get('/downloadfile/:filename', (req, res) => {
   let fileName = getFileName(req.params.filename)
-  res.download(folderOutput, fileName)
+  if (fileName === 'fnf') {
+    res.send('invalid file name')
+  } else {
+    let filePath = [folderOutput, fileName].join('/')
+    console.log('filePath', filePath)
+    res.writeHead(200, {
+      'Content-Typ': 'application/octet-stream',
+      'Content-Disposition': 'attachment; filename=' + fileName})
+    fs.createReadStream(filePath).pipe(res)
+  }
 })
 
 APIadmin.get('/data-integrity-process', (req, res) => {
