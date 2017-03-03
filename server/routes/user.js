@@ -11,8 +11,12 @@ APIuser.post('/votedone', function (req, res) {
   const hkid = req.body.hkid
   db.insert('users', { _id: phone, hkid: hkid, voted: true }, function (err, cb) {
     if (err) {
-      res.send({err: 'error adding voters'})
-      console.log('error upsert user', err)
+      if (err.code === 11000) {
+        res.send('phone already vote')
+      } else {
+        res.send({err: 'error adding voters'})
+        console.log('error insert user', err)
+      }
     } else {
       res.send('vote done')
     }
