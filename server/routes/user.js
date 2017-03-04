@@ -43,7 +43,7 @@ APIuser.get('/getbytid', function (req, res) {
       console.log('error searching user - getbytelegramid', err)
     } else if (record) {
       record.signed_up = true
-      res.send('user exists', record)
+      res.send(record)
     } else {
       res.send('telegramid doesn`t exist')
     }
